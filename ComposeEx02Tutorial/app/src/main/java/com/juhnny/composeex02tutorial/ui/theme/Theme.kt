@@ -9,13 +9,17 @@ import androidx.compose.runtime.Composable
 private val DarkColorPalette = darkColors(
     primary = Purple200,
     primaryVariant = Purple700,
-    secondary = Teal200
+//    secondary = Teal200,
+
+    //secondaryVariant를 명시적으로 설정 안하니 secondary 색상이 나온다.
+    secondary = Red200,
+//    secondaryVariant = Orange200,
 )
 
 private val LightColorPalette = lightColors(
     primary = Purple500,
     primaryVariant = Purple700,
-    secondary = Teal200
+    secondary = Teal200,
 
     /* Other default colors to override
     background = Color.White,
@@ -27,6 +31,7 @@ private val LightColorPalette = lightColors(
     */
 )
 
+// Theme함수도 Composable이네 ㅎㅎ
 @Composable
 fun ComposeEx02TutorialTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
