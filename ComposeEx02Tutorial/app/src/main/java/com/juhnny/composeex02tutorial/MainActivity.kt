@@ -7,6 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -123,6 +125,7 @@ class MainActivity : ComponentActivity() {
 
     // @Preview annotation을 동시에 여러 개 사용할 수도 있다.
     // 이름을 추가해 구분할 수 있고 Night mode를 켠 상태를 함께 볼 수도 있다.
+    // 그느데 왜 Night mode 색상이 제대로 보여지지가 않지?
     @Preview(
         name = "Light Mode",
         showBackground = true //배경색 함께 보기
@@ -160,5 +163,31 @@ class MainActivity : ComponentActivity() {
 
     // 4. Lists and animations
     // TODO 내용 추가
+    // 위에서 만든 MessageCard2를 채팅처럼, ListView처럼 보여줘보자
+    @Composable
+    fun Conversation(messages : List<Message>){
+        // LazyColumn, LazyRow
+        // 화면에 보여지는 컴포저블만 render 한다. 대량의 데이터를 보여줄 때 효율적이다.
+        LazyColumn(){
+            items(messages){ message ->
+                MessageCard2(msg = message)
+            }
+        }
+    }
+
+    // Tutorial에서 샘플로 제공된 데이터를 SampleData.kt로 추가하고 적절히 손봐주었다.
+    // https://gist.github.com/yrezgui/26a1060d67bf0ec2a73fa12695166436
+
+    @Preview
+    @Composable
+    fun PreviewConversation(){
+        val data = SampleData.conversationSample
+        ComposeEx02TutorialTheme {
+            Conversation(messages = data)
+        }
+    }
+
+    // 클릭하면 메시지가 펼쳐졌다가 닫혔다가 하도록 컴포저블의 모양을 바꿔보자
+
 
 }
