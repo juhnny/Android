@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,6 +15,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -50,13 +55,17 @@ class MainActivity : ComponentActivity() {
             // ui.theme 패키지에 있는 Theme.kt에 있는 Theme 함수를 이용
             // Surface는 무슨 차이가 있지?
             // Surface는 컨테이너로써의 역할. 마치 div 태그
-            ComposeEx02TutorialTheme{
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-//                    color = Color.LightGray, // 마지막 콤마 찍어도 문제 없네
-                ){
-                    MessageCard2(msg = Message("Anna", "Where are you?"))
-                }
+//            ComposeEx02TutorialTheme{
+//                Surface(
+//                    modifier = Modifier.fillMaxSize(),
+////                    color = Color.LightGray, // 마지막 콤마 찍어도 문제 없네
+//                ){
+//                    MessageCard2(msg = Message("Anna", "Where are you?"))
+//                }
+//            }
+
+            ComposeEx02TutorialTheme() {
+                Conversation(messages = SampleData.conversationSample)
             }
         }
     }
@@ -101,8 +110,16 @@ class MainActivity : ComponentActivity() {
             )
             // 수평 space 추가
             Spacer(modifier = Modifier.width(8.dp))
+
+            // Composable의 state (설명 하단에 추가)
+            // by를 사용하기 위해 getValue, setValue import 필요
+            var isExpanded by remember() {
+                mutableStateOf(false)
+            }
+
             // Column 함수를 쓰면 세로 방향으로 배열
-            Column {
+            // click 때마다 isExpanded 값을 반대로 바꿈
+            Column(modifier = Modifier.clickable { isExpanded = ! isExpanded }) {
                 Text(
                     text = msg.author,
                     color = MaterialTheme.colors.secondaryVariant,
@@ -114,14 +131,14 @@ class MainActivity : ComponentActivity() {
                     Text(
                         text = msg.body,
                         style = MaterialTheme.typography.body2,
-                        modifier = Modifier.padding(all = 4.dp)
+                        modifier = Modifier.padding(all = 4.dp),
+                        // 메시지가 펼쳐져 있으면 내용을 전부 보여주고 아니면 한 줄만 보여주도록
+                        maxLines = if(isExpanded) Int.MAX_VALUE else 1,
                     )
                 }
             }
         }
-        
     }
-
 
     // @Preview annotation을 동시에 여러 개 사용할 수도 있다.
     // 이름을 추가해 구분할 수 있고 Night mode를 켠 상태를 함께 볼 수도 있다.
@@ -162,7 +179,6 @@ class MainActivity : ComponentActivity() {
 
 
     // 4. Lists and animations
-    // TODO 내용 추가
     // 위에서 만든 MessageCard2를 채팅처럼, ListView처럼 보여줘보자
     @Composable
     fun Conversation(messages : List<Message>){
@@ -188,6 +204,38 @@ class MainActivity : ComponentActivity() {
     }
 
     // 클릭하면 메시지가 펼쳐졌다가 닫혔다가 하도록 컴포저블의 모양을 바꿔보자
-
+    // MessageCard2 내에 이 카드의 펼침/닫힘 상태를 저장하는 state 변수인 isExpanded 추가
+    // Text composable에서 isExpanded를 조건으로 maxLines를 다르게 보여주도록 함
 
 }
+
+// Composable의 state
+// https://origogi.github.io/android/compose-state
+// Composable 은 상태에 따라 UI를 구성하고 Composable 은 함수이기 때문에
+// 상태값을 지역 변수로 저장하면 재구성이 될 때마다 함수가 새로 호출이 되기 때문에
+// 지역 변수에 저장된 상태 값은 소실이 됩니다. 따라서 재구성 즉 Composable 함수가 호출이 되어도
+// 상태 값을 계속 유지를 해야합니다. 이를 지원하는 것이 바로 remember 라는 delegate 입니다.
+
+// 그리고 Composable에서 상태를 저장하고 상태가 변경이 되었을 때 재구성을 하기 위해서는 관찰가능한 객체를 사용하게 됩니다.
+
+// 이를 위해 MutableState<T> 를 사용하며 만약 State를 업데이트를 하게 된다면
+// 해당 State를 관찰하고 있는 해당 Composable 를 재구성하게 됩니다.
+// MutableState<T> 를 생성하기 위해서 mutableStateOf() api를 사용하게 됩니다.
+//interface MutableState<T> : State<T> {
+//   override var value: T
+//}
+
+// Composable에서 관찰가능하고 재구성이 여러번 호출되어도 상태 정보를 계속 유지하기 위해
+// 위에서 언급한 remember 와 MutableState<T> 를 이용하여 구현합니다.
+
+//Composable 에서 MutableState 객체를 선언하는 데는 세 가지 방법이 있습니다.
+//val mutableState = remember { mutableStateOf(default) }
+//var value by remember { mutableStateOf(default) }
+//val (value, setValue) = remember { mutableStateOf(default) }
+
+// Composable functions can store local state in memory by using remember,
+// and track changes to the value passed to mutableStateOf.
+// Composables (and their children) using this state will get redrawn automatically
+// when the value is updated. This is called recomposition.
+
+// TODO by, remember, MutableState에 대해 더 공부해봐야겠다.
