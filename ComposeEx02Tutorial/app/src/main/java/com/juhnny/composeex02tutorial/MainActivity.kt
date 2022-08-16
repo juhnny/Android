@@ -164,6 +164,9 @@ class MainActivity : ComponentActivity() {
     // Material Design widget들로 앱을 꾸며보자
     // Material Design을 이용해서 디자인하는 게 일관성을 유지하며 유지보수하기 좋은 것 같다.
 
+    // Compose에서는 소스코드와 테마가 분리돼있어서 Material Design을 사용하든,
+    // 나만의 디자인을 사용하든 유연하게 적용할 수 있다고 한다.
+
     // Material Design은 Color, Typography, Shape 세가지를 축으로 한다.
 
     // Color
